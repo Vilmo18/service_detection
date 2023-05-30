@@ -12,6 +12,7 @@ import pandas as pd
 import requests
 import random as rd
 from bson.json_util import dumps
+import pickle
 
 
 app = Flask(__name__)
@@ -22,11 +23,28 @@ db = mongo_db.db
 
 @app.route('/detection/update')
 def transaction():
-
-    model = pickle.load(open("model.pkl", "rb"))
+    """model = pickle.load(open("model.pkl", "rb"))
     prediction = model.predict([0, 0, 0, 0])
-    print(prediction)
+    print(prediction)"""
+    # id=requests.args.get('id')
+    val = []
+    result = db.agents.find()
+    j = 0
+    model = pickle.load(open("detection.pkl", "rb"))
+    for i in result:
+        print(i)
+        prediction = model.predict(
+            [[i['diff_recens'], i['diff_conges'], i['diff_travail'], i['actif']]])
+        if (prediction[0] == 'pas fraude'):
+            val.append(i)
+            print(prediction[0])
+        j = j+1
+    return json.loads(dumps(val))
 
+
+if __name__ == '__main__':
+    app.run(debug=True, port=6000)
+    print("lancement")
 
 # récupération du contenu à l'aide de la méthode get()
 """r = requests.get("https://jsonplaceholder.typicode.com/posts")
@@ -39,8 +57,4 @@ def test_get():
 @app.route('/enregistrement',methods=['POST'])
 def enregistrement():
     pass
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-    print("lancement")"""
+"""
