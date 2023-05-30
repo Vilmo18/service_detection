@@ -32,13 +32,28 @@ def transaction():
     j = 0
     model = pickle.load(open("detection.pkl", "rb"))
     for i in result:
-        print(i)
         prediction = model.predict(
             [[i['diff_recens'], i['diff_conges'], i['diff_travail'], i['actif']]])
-        if (prediction[0] == 'pas fraude'):
+        if (prediction[0] == 'fraude'):
             val.append(i)
             print(prediction[0])
-        j = j+1
+            print(val[j], end='\n')
+            # ajout dans ma bd transaction
+            db.detected.insert_one(val[j])
+            # Suppresion dans la agents des frauduleux
+            db.agents.delete_one({'matricule': val[j]['matricule']})
+            j = j+1
+    return json.loads(dumps(val))
+
+
+# Function which is used for list of detected
+@app.route('/Agent/fraud_detected')
+def solde():
+    # id=requests.args.get('id')
+    val = []
+    result = db.detected.find()
+    for i in result:
+        val.append(i)
     return json.loads(dumps(val))
 
 
