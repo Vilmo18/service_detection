@@ -17,7 +17,10 @@ import pickle
 
 app = Flask(__name__)
 CORS(app)
-mongo_db = PyMongo(app, uri='mongodb://127.0.0.1:27017/minfopra')
+# mongo_db = PyMongo(app, uri='mongodb://127.0.0.1:27017/minfopra')
+mongo_db = PyMongo(
+    app, uri='mongodb+srv://yvanvilmorin:Minfi659287507@minfi.gzqssvj.mongodb.net/minfopra')
+
 db = mongo_db.db
 
 
